@@ -1,4 +1,3 @@
-// 模拟数据
 var comments = [
   {
     name: 'zhangsan',
@@ -21,55 +20,49 @@ var comments = [
     dataTime: '2019-02-23'
   }
 ]
-
-var http = require('http')
 var fs = require('fs')
-var template = require('art-template')
+var http = require('http')
 var url = require('url')
-
+var template = require('art-template')
 http
   .createServer(function(req, res) {
-    var path = url.parse(req.url, true)
-    var pathName = path.pathname
-    if (pathName === '/') {
+    var pathObj = url.parse(req.url, true)
+    var pathname = pathObj.pathname
+    if (pathname === '/') {
       fs.readFile('./view/index.html', function(err, data) {
         if (err) {
-          res.end('404 Not Found')
-          return
+          return res.end('Not Found 404')
         }
         data = template.render(data.toString(), {
           comments: comments
         })
         res.end(data)
       })
-    } else if (pathName === '/post') {
+    } else if (pathname === '/post') {
       fs.readFile('./view/post.html', function(err, data) {
         if (err) {
-          res.end('404 Not Found')
-          return
+          return res.end('Not Found 404')
         }
         res.end(data)
       })
-    } else if (pathName === '/comment') {
-      var commentData = path.query
-      commentData.dataTime = '2019-03-13 17:30:30'
-      comments.unshift(commentData)
+    } else if (pathname === '/comment') {
+      var query = pathObj.query
+      query.dataTime = '2019-01-12 12:30:30'
+      comments.unshift(query)
       res.statusCode = 302
-      res.setHeader('Location', '/')
+      res.setHeader('location', '/')
       res.end()
-    } else if (pathName.indexOf('/public/') === 0) {
-      fs.readFile('.' + pathName, function(err, data) {
+    } else if (pathname.indexOf('/public/') === 0) {
+      fs.readFile('.' + pathname, function(err, data) {
         if (err) {
-          res.end('404 Not Found')
-          return
+          return res.end('Not Found 404')
         }
         res.end(data)
       })
     } else {
       fs.readFile('./view/404.html', function(err, data) {
         if (err) {
-          res.end('404 Not Found')
-          return
+          return res.end('Not Found 404')
         }
         res.end(data)
       })
